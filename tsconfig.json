@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "types": [
+      "node",
+      "@wdio/globals/types",
+      "@wdio/cucumber-framework",
+      "@wdio/devtools-service"
+    ],
+    "target": "es6",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "inlineSourceMap": true
+  }
+}
