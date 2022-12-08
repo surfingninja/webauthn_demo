@@ -2,6 +2,7 @@
 
 1. Clone project.
 2. Make sure you have jdk and node installed.
+3. Run `npm init` in order to initiate package.json
 3. Run `npm install`
 
 
