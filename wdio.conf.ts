@@ -1,4 +1,5 @@
 import type { Options } from '@wdio/types'
+import report from '@wdio/allure-reporter'
 
 interface IChromeOption {
     args: string[];
@@ -6,10 +7,11 @@ interface IChromeOption {
 }
 
 const deviceName = process.env.DEVICE_NAME;
+const isHeadless = process.env.IS_HEADLESS;
 const chromeOptions: IChromeOption = {
     args: [
+        '--window-size=1920,1080',
         '--no-sandbox',
-        // '--window-size=1920,1080',
         // '--use-fake-device-for-media-stream',
         '--disable-notifications',
         '--allow-insecure-localhost',
@@ -20,8 +22,13 @@ const chromeOptions: IChromeOption = {
     // mobileEmulation: { deviceName: deviceName }
 }
 
+if (isHeadless) {
+    chromeOptions.args.push('--headless');
+}
+
 if (deviceName) {
     chromeOptions.mobileEmulation = { deviceName };
+    chromeOptions.args.shift();
 }
 
 export const config: Options.Testrunner = {
@@ -74,8 +81,7 @@ export const config: Options.Testrunner = {
     // will be called from there.
     //
     specs: [
-        // './test/features/**/home.feature'
-        './test/features/**/register.feature'
+        './test/features/**/failauth.feature'
     ],
     // Patterns to exclude.
     exclude: [
@@ -117,15 +123,6 @@ export const config: Options.Testrunner = {
         // excludeDriverLogs: ['*'], // pass '*' to exclude all driver session logs
         // excludeDriverLogs: ['bugreport', 'server'],
         "goog:chromeOptions": chromeOptions
-        // args: [
-        //     '--no-sandbox',
-        //     // '--window-size=1920,1080',
-        //     // '--use-fake-device-for-media-stream',
-        //     '--disable-notifications',
-        //     '--allow-insecure-localhost',
-        //     '--disable-infobars',
-        // ],
-        // mobileEmulation: { deviceName: deviceName }
     }
     ],
     //
@@ -160,8 +157,9 @@ export const config: Options.Testrunner = {
     // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
     // gets prepended directly.
     baseUrl: 'http://localhost',
-    // port: 4723,
-    // path: '/wd/hub',
+    hostname: 'localhost',
+    port: 4444,
+    path: '/wd/hub',
     //
     // Default timeout for all waitFor* commands.
     waitforTimeout: 10000,
@@ -171,7 +169,7 @@ export const config: Options.Testrunner = {
     connectionRetryTimeout: 120000,
     //
     // Default request retries count
-    connectionRetryCount: 3,
+    connectionRetryCount: 2,
     //
     // Test runner services
     // Services take over a specific job you don't want to take care of. They enhance
@@ -179,7 +177,20 @@ export const config: Options.Testrunner = {
     // commands. Instead, they hook themselves up into the test process.
     services: [
         // 'devtools'
-        'selenium-standalone'
+        ['selenium-standalone', {
+            logPath: './temp',
+            installArgs: {
+                drivers: {
+                    chrome: { version: 'latest' }
+                }
+            },
+            args: {
+                drivers: {
+                    chrome: { version: 'latest' }
+                }
+            },
+        }
+        ]
         // ['appium', {
         //     args: { address: 'localhost', port: 4723, platform: 'Android' },
         //     logPath: './',
@@ -370,8 +381,13 @@ export const config: Options.Testrunner = {
      * @param {String}                   uri      path to feature file
      * @param {GherkinDocument.IFeature} feature  Cucumber feature object
      */
-    // afterFeature: function (uri, feature) {
-    // },
+    afterFeature: function (uri, feature) {
+        report.addEnvironment('Browser', 'Chrome');
+        if(deviceName) {
+            report.addEnvironment('Device', deviceName);
+        }
+        report.addEnvironment('Platform', process.platform);
+    },
 
     /**
      * Runs after a WebdriverIO command gets executed

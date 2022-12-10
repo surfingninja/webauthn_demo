@@ -1,4 +1,8 @@
-name: CI for mobile test run
+name: CI for mobile (Pixel 5) test run
+
+env:
+  NODE_CACHE_NAME: cache-node-modules
+  RUN_ID: ${{ github.run_id }}
 
 on:
   push:
@@ -20,39 +24,82 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
-    - name: Set up JDK 11
-      uses: actions/setup-java@v1
-      with:
-        java-version: '11.0.3'
+      uses: actions/checkout@v3
     - name: Set up NodeJS
       uses: actions/setup-node@v2
       with:
         node-version: '16.13.0'
         cache: 'npm'
-    
-    - name: Intastall packages and run test
-      run: >-
-        npm init
-        npm install
-        DEVICE_NAME='Pixel 5' npm run test
-    
-    - uses: actions/upload-artifact@master
+    - name: Cache node modules
+      id: node_modules_cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/node_modules
+        key: ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Install node modules dependencies if missing
+      if: $${{ steps.node_modules_cache.cache-hit }} != 'true'
+      run: npm install
+
+  test:
+    needs: build 
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '11.0.3'
+    - name: Restore node cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/node_modules
+        key: ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-${{ hashFiles('**/package-lock.json') }}
+    - name: Run mobile emulation tests with Pixel 5
+      run: DEVICE_NAME='Pixel 5' IS_HEADLESS=true npm run test
+    - name: Cache allure-results
+      uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/allure-results
+        key: allure-results-${{github.RUN_ID}}
+
+  upload-artifact:
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+    - uses: actions/checkout@v3
+    - name: Get allure-results
+      uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/allure-results
+        key: allure-results-${{github.RUN_ID}}
+    - uses: actions/upload-artifact@v2
       with:
         name: allure-results
         path: allure-results
         retention-days: 20
-    
+
+  allure-report:
+    needs: upload-artifact
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
     - name: Get Allure history
-      uses: actions/checkout@v2
-      if: always()
+      uses: actions/checkout@v3
       continue-on-error: true
-      with:
+      with: 
         ref: gh-pages
         path: gh-pages
+    - uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/allure-results
+        key: allure-results-${{github.RUN_ID}}
 
     - name: Test marketplace action
       uses: simple-elf/allure-report-action@master
@@ -72,15 +119,6 @@ jobs:
         PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         PUBLISH_BRANCH: gh-pages
         PUBLISH_DIR: allure-history
-
-    - name: Post the link to the report
-      if: always()
-      uses: Sibz/github-status-action@v1
-      with: 
-        authToken: ${{secrets.GITHUB_TOKEN}}
-        context: 'Test report'
-        state: 'success'
-        sha: ${{ github.event.pull_request.head.sha }}
-        target_url: simple-elf.github.io/github-allure-history/${{ github.run_number }}
+        target_url: https://${{ github.actor }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}
 
 

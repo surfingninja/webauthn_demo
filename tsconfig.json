@@ -7,6 +7,10 @@
       "@wdio/cucumber-framework",
       "@wdio/devtools-service"
     ],
+    "lib": [
+      "DOM",
+      "ES7"
+    ],
     "target": "es6",
     "module": "commonjs",
     "esModuleInterop": true,
