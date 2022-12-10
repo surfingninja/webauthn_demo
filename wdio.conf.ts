@@ -9,8 +9,8 @@ const deviceName = process.env.DEVICE_NAME;
 const isHeadless = process.env.IS_HEADLESS;
 const chromeOptions: IChromeOption = {
     args: [
+        '--window-size=1920,1080',
         '--no-sandbox',
-        // '--window-size=1920,1080',
         // '--use-fake-device-for-media-stream',
         '--disable-notifications',
         '--allow-insecure-localhost',
@@ -27,6 +27,7 @@ if (isHeadless) {
 
 if (deviceName) {
     chromeOptions.mobileEmulation = { deviceName };
+    chromeOptions.args.shift();
 }
 
 export const config: Options.Testrunner = {

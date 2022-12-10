@@ -1,4 +1,4 @@
-name: CI for usual run on windows image
+name: CI run on windows
 
 on:
   push:
@@ -41,5 +41,4 @@ jobs:
     steps:
     - name: Run feautures with standalone
       run: >-
-        npm init
         npm run test
