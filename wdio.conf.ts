@@ -1,4 +1,5 @@
 import type { Options } from '@wdio/types'
+import report from '@wdio/allure-reporter'
 
 interface IChromeOption {
     args: string[];
@@ -380,8 +381,13 @@ export const config: Options.Testrunner = {
      * @param {String}                   uri      path to feature file
      * @param {GherkinDocument.IFeature} feature  Cucumber feature object
      */
-    // afterFeature: function (uri, feature) {
-    // },
+    afterFeature: function (uri, feature) {
+        report.addEnvironment('Browser', 'Chrome');
+        if(deviceName) {
+            report.addEnvironment('Device', deviceName);
+        }
+        report.addEnvironment('Platform', process.platform);
+    },
 
     /**
      * Runs after a WebdriverIO command gets executed
