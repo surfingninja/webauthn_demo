@@ -61,7 +61,7 @@ jobs:
         path: ${{ github.workspace }}/node_modules
         key: ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-${{ hashFiles('**/package-lock.json') }}
     - name: Run mobile emulation tests with Pixel 5
-      run: DEVICE_NAME='Pixel 5' npm run test
+      run: DEVICE_NAME='Pixel 5' IS_HEADLESS=true npm run test
     - name: Cache allure-results
       uses: actions/cache@v3
       with:
@@ -71,6 +71,7 @@ jobs:
   upload-artifact:
     needs: test
     runs-on: ubuntu-latest
+    if: always()
     steps:
     - uses: actions/checkout@v3
     - name: Get allure-results
@@ -87,10 +88,10 @@ jobs:
   allure-report:
     needs: upload-artifact
     runs-on: ubuntu-latest
+    if: always()
     steps:
     - name: Get Allure history
       uses: actions/checkout@v3
-      if: always()
       continue-on-error: true
       with: 
         ref: gh-pages
