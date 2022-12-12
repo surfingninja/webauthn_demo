@@ -82,7 +82,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: allure-results
-        path: ${{ github.workspace }}/allure-results
+        path: allure-results
         if-no-files-found: error
         retention-days: 20
 
@@ -120,12 +120,14 @@ jobs:
         PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         PUBLISH_BRANCH: gh-pages
         PUBLISH_DIR: allure-history
+    
+    - name: Upload url to file
+      env:
         target_url: https://${{ github.actor }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}
-    - run: echo "$target_url" > "report_url"
-    - name: Upload report url
-      uses: actions/upload-artifact@v3
+      run: echo "$target_url" > "report_url.txt"
+    - uses: actions/upload-artifact@v3
       with:
         name: ReportUrl
-        path: "report_url"
+        path: "report_url.txt"
 
 
