@@ -69,12 +69,12 @@ jobs:
     - name: Cache allure-results
       uses: actions/cache@v3
       with:
-        path: ${{ github.workspace }}/allure-results
+        path: ${{ github.workspace }}\allure-results
         key: allure-results-${{github.RUN_ID}}
   
   upload-artifact:
     needs: test
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     if: always()
     steps:
     - uses: actions/checkout@v3
