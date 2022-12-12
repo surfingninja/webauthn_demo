@@ -57,7 +57,9 @@ jobs:
         path: ${{ github.workspace }}/node_modules
         key: ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-${{ hashFiles('**/package-lock.json') }}
     - name: Run tests in browser
-      run: SET IS_HEADLESS=true npm run test
+      run: | 
+        SET IS_HEADLESS=true \
+        npm run test
     - name: Cache allure-results
       uses: actions/cache@v3
       with:
