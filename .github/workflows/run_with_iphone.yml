@@ -60,7 +60,7 @@ jobs:
       with:
         path: ${{ github.workspace }}/node_modules
         key: ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-${{ hashFiles('**/package-lock.json') }}
-    - name: Run mobile emulation tests with Pixel 5
+    - name: Run mobile emulation tests with iPhone X
       run: DEVICE_NAME='iPhone X' IS_HEADLESS=true npm run test
     - name: Cache allure-results
       uses: actions/cache@v3
@@ -82,7 +82,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         path: allure-results
-        name: ${{ github.workspace }}/allure-results
+        name: allure-results
         if-no-files-found: error
         retention-days: 20
 
