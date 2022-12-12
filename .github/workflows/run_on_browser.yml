@@ -68,7 +68,7 @@ jobs:
   
   upload-artifact:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     if: always()
     steps:
     - uses: actions/checkout@v3
@@ -86,7 +86,7 @@ jobs:
 
   allure-report:
     needs: upload-artifact
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     if: always()
     steps:
     - name: Get Allure history
