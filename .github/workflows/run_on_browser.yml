@@ -69,7 +69,7 @@ jobs:
     - name: Cache allure-results
       uses: actions/cache@v3
       with:
-        path: ${{ github.workspace }}\allure-results
+        path: allure-results
         key: allure-results-${{github.RUN_ID}}
   
   upload-artifact:
@@ -81,7 +81,7 @@ jobs:
     - name: Get allure-results
       uses: actions/cache@v3
       with:
-        path: ${{ github.workspace }}/allure-results
+        path: allure-results
         key: allure-results-${{github.RUN_ID}}
     - uses: actions/upload-artifact@v2
       with:
