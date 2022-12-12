@@ -1,4 +1,4 @@
-name: CI for mobile (Pixel 5) test run
+name: CI for mobile (iPhone X) test run
 
 env:
   NODE_CACHE_NAME: cache-node-modules
