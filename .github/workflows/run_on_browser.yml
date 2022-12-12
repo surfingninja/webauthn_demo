@@ -103,7 +103,7 @@ jobs:
         path: gh-pages
     - uses: actions/cache@v3
       with:
-        path: ${{ github.workspace }}/allure-results
+        path: allure-results
         key: allure-results-${{github.RUN_ID}}
 
     - name: Test marketplace action
