@@ -65,30 +65,30 @@ jobs:
     - name: Cache allure-results
       uses: actions/cache@v3
       with:
-        path: ${{ github.workspace }}/allure-results
+        path: allure-results
         key: allure-results-${{github.RUN_ID}}
 
   upload-artifact:
     needs: test
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     if: always()
     steps:
     - uses: actions/checkout@v3
     - name: Get allure-results
       uses: actions/cache@v3
       with:
-        path: ${{ github.workspace }}/allure-results
+        path: allure-results
         key: allure-results-${{github.RUN_ID}}
     - uses: actions/upload-artifact@v2
       with:
-        name: allure-results
         path: allure-results
+        name: ${{ github.workspace }}/allure-results
         if-no-files-found: error
         retention-days: 20
 
   allure-report:
     needs: upload-artifact
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     if: always()
     steps:
     - name: Get Allure history
@@ -99,7 +99,7 @@ jobs:
         path: gh-pages
     - uses: actions/cache@v3
       with:
-        path: ${{ github.workspace }}/allure-results
+        path: allure-results
         key: allure-results-${{github.RUN_ID}}
 
     - name: Test marketplace action
