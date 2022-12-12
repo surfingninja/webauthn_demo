@@ -1,1 +1,1 @@
-[{"uid":"81269cf8936f5fe7","name":"As user I can open the Weabuthn site","time":{"start":1670851950463,"stop":1670851955022,"duration":4559},"status":"passed","severity":"normal"}]
+[{"uid":"66bc006b81b31b7a","name":"As user I can open the Weabuthn site","time":{"start":1670876127544,"stop":1670876131019,"duration":3475},"status":"passed","severity":"normal"},{"uid":"79c4f3526119a740","name":"As user I can register on the WeabuthnIO","time":{"start":1670876127523,"stop":1670876133958,"duration":6435},"status":"passed","severity":"normal"}]
