@@ -63,6 +63,7 @@ jobs:
     - name: Run mobile emulation tests with Pixel 5
       run: DEVICE_NAME='Pixel 5' IS_HEADLESS=true npm run test
     - name: Cache allure-results
+      if: always()
       uses: actions/cache@v3
       with:
         path: ${{ github.workspace }}/allure-results

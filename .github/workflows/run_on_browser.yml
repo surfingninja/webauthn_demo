@@ -67,6 +67,7 @@ jobs:
         echo "Adding GNU tar to PATH"
         echo C:\Program Files\Git\usr\bin>>"%GITHUB_PATH%"
     - name: Cache allure-results
+      if: always()
       uses: actions/cache@v3
       with:
         path: allure-results
@@ -86,7 +87,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: allure-results
-        path: ${{ github.workspace }}/allure-results
+        path: allure-results
         if-no-files-found: error
         retention-days: 20
 

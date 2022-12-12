@@ -63,6 +63,7 @@ jobs:
     - name: Run mobile emulation tests with iPhone X
       run: DEVICE_NAME='iPhone X' IS_HEADLESS=true npm run test
     - name: Cache allure-results
+      if: always()
       uses: actions/cache@v3
       with:
         path: allure-results
@@ -81,8 +82,8 @@ jobs:
         key: allure-results-${{github.RUN_ID}}
     - uses: actions/upload-artifact@v2
       with:
-        path: ${{ github.workspace }}/allure-results
         name: allure-results
+        path: ${{ github.workspace }}/allure-results
         if-no-files-found: error
         retention-days: 20
 
