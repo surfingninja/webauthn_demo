@@ -86,7 +86,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: allure-results
-        path: allure-results
+        path: ${{ github.workspace }}/allure-results
         if-no-files-found: error
         retention-days: 20
 
