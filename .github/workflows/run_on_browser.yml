@@ -60,6 +60,12 @@ jobs:
       run: | 
         SET IS_HEADLESS=true \
         npm run test
+    - if: ${{ runner.os == 'Windows' }}
+      name: Use GNU tar
+      shell: cmd
+      run: |
+        echo "Adding GNU tar to PATH"
+        echo C:\Program Files\Git\usr\bin>>"%GITHUB_PATH%"
     - name: Cache allure-results
       uses: actions/cache@v3
       with:
@@ -86,13 +92,13 @@ jobs:
 
   allure-report:
     needs: upload-artifact
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     if: always()
     steps:
     - name: Get Allure history
       uses: actions/checkout@v3
       continue-on-error: true
-      with: 
+      with:
         ref: gh-pages
         path: gh-pages
     - uses: actions/cache@v3
