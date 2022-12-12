@@ -81,7 +81,7 @@ jobs:
         key: allure-results-${{github.RUN_ID}}
     - uses: actions/upload-artifact@v2
       with:
-        path: allure-results
+        path: ${{ github.workspace }}/allure-results
         name: allure-results
         if-no-files-found: error
         retention-days: 20
