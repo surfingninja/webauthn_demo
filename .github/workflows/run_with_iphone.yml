@@ -1,0 +1,133 @@
+name: CI for mobile (iPhone X) test run
+
+env:
+  NODE_CACHE_NAME: cache-node-modules
+  RUN_ID: ${{ github.run_id }}
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set up NodeJS
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16.13.0'
+        cache: 'npm'
+    - name: Cache node modules
+      id: node_modules_cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/node_modules
+        key: ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Install node modules dependencies if missing
+      if: $${{ steps.node_modules_cache.cache-hit }} != 'true'
+      run: npm install
+
+  test:
+    needs: build 
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '11.0.3'
+    - name: Restore node cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/node_modules
+        key: ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-${{ hashFiles('**/package-lock.json') }}
+    - name: Run mobile emulation tests with Pixel 5
+      run: DEVICE_NAME='iPhone X' IS_HEADLESS=true npm run test
+    - name: Cache allure-results
+      uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/allure-results
+        key: allure-results-${{github.RUN_ID}}
+
+  upload-artifact:
+    needs: test
+    runs-on: macos-latest
+    if: always()
+    steps:
+    - uses: actions/checkout@v3
+    - name: Get allure-results
+      uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/allure-results
+        key: allure-results-${{github.RUN_ID}}
+    - uses: actions/upload-artifact@v2
+      with:
+        name: allure-results
+        path: allure-results
+        if-no-files-found: error
+        retention-days: 20
+
+  allure-report:
+    needs: upload-artifact
+    runs-on: macos-latest
+    if: always()
+    steps:
+    - name: Get Allure history
+      uses: actions/checkout@v3
+      continue-on-error: true
+      with: 
+        ref: gh-pages
+        path: gh-pages
+    - uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/allure-results
+        key: allure-results-${{github.RUN_ID}}
+
+    - name: Test marketplace action
+      uses: simple-elf/allure-report-action@master
+      if: always()
+      id: allure-report
+      with:
+        allure_results: allure-results
+        gh_pages: gh-pages
+        allure_report: allure-report
+        allure_history: allure-history
+        keep_reports: 20
+
+    - name: Deploy report to Github Pages
+      if: always()
+      uses: peaceiris/actions-gh-pages@v2
+      env:
+        PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PUBLISH_BRANCH: gh-pages
+        PUBLISH_DIR: allure-history
+    
+    - name: Upload url to file
+      env:
+        target_url: https://${{ github.actor }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}
+      run: echo "$target_url" > "report_url.txt"
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ReportUrl
+        path: "report_url.txt"
+
+
