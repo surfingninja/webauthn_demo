@@ -1,0 +1,3 @@
+"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
+"passed","Tue Dec 13 16:03:47 GMT 2022","Tue Dec 13 16:03:53 GMT 2022","6588","","Webauthn negative authentication","","Webauthn negative authentication","As user I can open the Weabuthn site","As user I can open the Weabuthn site",""
+"passed","Tue Dec 13 16:03:47 GMT 2022","Tue Dec 13 16:03:57 GMT 2022","9826","","Webauthn registration","","Webauthn registration","As user I can register on the WeabuthnIO","As user I can register on the WeabuthnIO",""
