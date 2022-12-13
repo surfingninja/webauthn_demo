@@ -1,0 +1,1 @@
+{"total":2,"items":[{"uid":"4493a118558927eb1e09c468e031c4d1","name":"Webauthn negative authentication","statistic":{"failed":0,"broken":0,"skipped":0,"passed":1,"unknown":0,"total":1}},{"uid":"ea47667946ee4e6982369fe38fdb1c97","name":"Webauthn registration","statistic":{"failed":0,"broken":0,"skipped":0,"passed":1,"unknown":0,"total":1}}]}
