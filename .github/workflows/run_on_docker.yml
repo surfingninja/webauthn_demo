@@ -55,7 +55,7 @@ jobs:
     - name: Run tests with docker
       run: |
         docker-compose -f docker-compose.grid.yml up -d
-        SERVICE_NAME='docker' npm run test
+        SERVICE_NAME='docker' IS_HEADLESS=true npm run test
         docker-compose -f docker-compose.grid.yml down
     - name: Cache allure-results
       if: always()
