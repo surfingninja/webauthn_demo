@@ -6,6 +6,7 @@ interface IChromeOption {
     mobileEmulation?: any;
 }
 
+const serviceName = process.env.SERVICE_NAME;
 const deviceName = process.env.DEVICE_NAME;
 const isHeadless = process.env.IS_HEADLESS;
 const chromeOptions: IChromeOption = {
@@ -20,6 +21,25 @@ const chromeOptions: IChromeOption = {
         '--ignore-certificate-errors'
     ],
     // mobileEmulation: { deviceName: deviceName }
+}
+
+const seleniumStandalone = ['selenium-standalone', {
+    logPath: './temp',
+    installArgs: {
+        drivers: {
+            chrome: { version: 'latest' }
+        }
+    },
+    args: {
+        drivers: {
+            chrome: { version: 'latest' }
+        }
+    },
+}];
+let serviceType: any = seleniumStandalone;
+
+if (serviceName) {
+    serviceType = serviceName;
 }
 
 if (isHeadless) {
@@ -176,21 +196,22 @@ export const config: Options.Testrunner = {
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
     services: [
+        serviceType
+        // 'docker'
         // 'devtools'
-        ['selenium-standalone', {
-            logPath: './temp',
-            installArgs: {
-                drivers: {
-                    chrome: { version: 'latest' }
-                }
-            },
-            args: {
-                drivers: {
-                    chrome: { version: 'latest' }
-                }
-            },
-        }
-        ]
+        // ['selenium-standalone', {
+        //     logPath: './temp',
+        //     installArgs: {
+        //         drivers: {
+        //             chrome: { version: 'latest' }
+        //         }
+        //     },
+        //     args: {
+        //         drivers: {
+        //             chrome: { version: 'latest' }
+        //         }
+        //     },
+        // }]
         // ['appium', {
         //     args: { address: 'localhost', port: 4723, platform: 'Android' },
         //     logPath: './',
@@ -383,7 +404,7 @@ export const config: Options.Testrunner = {
      */
     afterFeature: function (uri, feature) {
         report.addEnvironment('Browser', 'Chrome');
-        if(deviceName) {
+        if (deviceName) {
             report.addEnvironment('Device', deviceName);
         }
         report.addEnvironment('Platform', process.platform);

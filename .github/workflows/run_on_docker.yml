@@ -1,0 +1,127 @@
+name: CI run tests on windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set up NodeJS
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18.12.1'
+        cache: 'npm'
+    - name: Cache node modules
+      id: node_modules_cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/node_modules
+        key: ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Install node modules dependencies if missing
+      if: $${{ steps.node_modules_cache.cache-hit }} != 'true'
+      run: npm install
+
+  test:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '11.0.3'
+    - name: Restore node cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/node_modules
+        key: ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-${{ hashFiles('**/package-lock.json') }}
+    - name: Run tests with docker
+      run: |
+        docker-compose -f docker-compose.grid.yml up -d
+        SERVICE_NAME='docker' npm run test
+        docker-compose -f docker-compose.grid.yml down
+    - name: Cache allure-results
+      if: always()
+      uses: actions/cache@v3
+      with:
+        path: allure-results
+        key: allure-results-${{github.RUN_ID}}
+  
+  upload-artifact:
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+    - uses: actions/checkout@v3
+    - name: Get allure-results
+      uses: actions/cache@v3
+      with:
+        path: allure-results
+        key: allure-results-${{github.RUN_ID}}
+    - uses: actions/upload-artifact@v2
+      with:
+        name: allure-results
+        path: allure-results
+        if-no-files-found: error
+        retention-days: 20
+
+  allure-report:
+    needs: upload-artifact
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+    - name: Get Allure history
+      uses: actions/checkout@v3
+      continue-on-error: true
+      with:
+        ref: gh-pages
+        path: gh-pages
+    - uses: actions/cache@v3
+      with:
+        path: allure-results
+        key: allure-results-${{github.RUN_ID}}
+
+    - name: Test marketplace action
+      uses: simple-elf/allure-report-action@master
+      if: always()
+      id: allure-report
+      with:
+        allure_results: allure-results
+        gh_pages: gh-pages
+        allure_report: allure-report
+        allure_history: allure-history
+        keep_reports: 20
+
+    - name: Deploy report to Github Pages
+      if: always()
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PUBLISH_BRANCH: gh-pages
+        PUBLISH_DIR: allure-history
+    
+    - name: Upload url to file
+      env:
+        target_url: https://${{ github.actor }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}
+      run: echo "$target_url" > "report_url.txt"
+    - uses: actions/upload-artifact@v3
+      with:
+        name: ReportUrl
+        path: "report_url.txt"
