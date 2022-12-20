@@ -1,4 +1,4 @@
-name: CI run tests on windows
+name: CI run tests with docker
 
 on:
   workflow_dispatch:
