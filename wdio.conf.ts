@@ -179,7 +179,7 @@ export const config: Options.Testrunner = {
     baseUrl: 'http://localhost',
     hostname: 'localhost',
     port: 4444,
-    path: '/wd/hub',
+    path: '/',
     //
     // Default timeout for all waitFor* commands.
     waitforTimeout: 10000,
