@@ -8,6 +8,7 @@ interface IChromeOption {
 
 const serviceName = process.env.SERVICE_NAME;
 const hostName = process.env.HOST_NAME;
+const hostPath = process.env.HOST_PATH;
 const deviceName = process.env.DEVICE_NAME;
 const isHeadless = process.env.IS_HEADLESS;
 const chromeOptions: IChromeOption = {
@@ -181,7 +182,7 @@ export const config: Options.Testrunner = {
     baseUrl: 'http://localhost',
     hostname: hostName ? hostName : 'localhost',
     port: 4444,
-    path: '/',
+    path: hostPath ? hostPath : '/',
     //
     // Default timeout for all waitFor* commands.
     waitforTimeout: 10000,
