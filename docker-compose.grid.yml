@@ -15,7 +15,7 @@ services:
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
     ports:
-      - "6900:5900"
+      - "5900"
   
   chrome0:
     image: selenium/node-chrome
@@ -29,7 +29,7 @@ services:
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
     ports:
-      - "6901:5900"
+      - "5900"
 
   edge:
     image: selenium/node-edge
