@@ -55,7 +55,8 @@ jobs:
     - name: Run tests with docker
       run: |
         docker-compose -f docker-compose.grid.yml up -d
-        SERVICE_NAME='docker' IS_HEADLESS=true npm run test
+        contIp = docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' selenium-hub
+        SERVICE_NAME='docker' HOST_NAME=$contIp npm run test
         docker-compose -f docker-compose.grid.yml down
     - name: Cache allure-results
       if: always()
