@@ -7,8 +7,11 @@ interface IChromeOption {
 }
 
 const serviceName = process.env.SERVICE_NAME;
+const hostName = process.env.HOST_NAME;
+const hostPath = process.env.HOST_PATH;
 const deviceName = process.env.DEVICE_NAME;
 const isHeadless = process.env.IS_HEADLESS;
+
 const chromeOptions: IChromeOption = {
     args: [
         '--window-size=1920,1080',
@@ -101,7 +104,7 @@ export const config: Options.Testrunner = {
     // will be called from there.
     //
     specs: [
-        './test/features/**/*.feature'
+        './test/features/**/failauth.feature'
     ],
     // Patterns to exclude.
     exclude: [
@@ -176,10 +179,11 @@ export const config: Options.Testrunner = {
     // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
     // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
     // gets prepended directly.
+    // runner: 'local',
     baseUrl: 'http://localhost',
-    hostname: 'localhost',
+    hostname: hostName ? hostName : 'localhost',
     port: 4444,
-    path: '/wd/hub',
+    path: hostPath ? hostPath : '/',
     //
     // Default timeout for all waitFor* commands.
     waitforTimeout: 10000,
