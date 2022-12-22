@@ -52,14 +52,14 @@ jobs:
       with:
         path: ${{ github.workspace }}/node_modules
         key: ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-${{ hashFiles('**/package-lock.json') }}
-    - name: Run tests with docker
+    - name: Run tests with selenium grid
       run: |
-        apt-get update
-        apt-get install jq
+        sudo apt-get update
+        sudo apt-get install jq
         docker-compose -f docker-compose.grid.yml up -d
-        bash wait-for-grid.sh
+        bash wait_for_grid.sh
         contIp=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' selenium-hub)
-        SERVICE_NAME='docker' HOST_NAME=$contIp HOST_PATH='/wd/hub' IS_HEADLESS=true npm run test
+        SERVICE_NAME='docker' HOST_NAME=$contIp HOST_PATH='/wd/hub' npm run test
         docker-compose -f docker-compose.grid.yml down
     - name: Cache allure-results
       if: always()
