@@ -52,7 +52,7 @@ jobs:
       with:
         path: ${{ github.workspace }}/node_modules
         key: ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-${{ hashFiles('**/package-lock.json') }}
-    - name: Run tests with docker
+    - name: Run tests with selenium grid
       run: |
         sudo apt-get update
         sudo apt-get install jq
