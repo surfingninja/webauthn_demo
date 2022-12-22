@@ -57,7 +57,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install jq
         docker-compose -f docker-compose.grid.yml up -d
-        bash wait-for-grid.sh
+        bash wait_for_grid.sh
         contIp=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' selenium-hub)
         SERVICE_NAME='docker' HOST_NAME=$contIp HOST_PATH='/wd/hub' IS_HEADLESS=true npm run test
         docker-compose -f docker-compose.grid.yml down
