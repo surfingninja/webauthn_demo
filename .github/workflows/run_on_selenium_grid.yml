@@ -54,8 +54,8 @@ jobs:
         key: ${{ runner.os }}-build-${{ env.NODE_CACHE_NAME }}-${{ hashFiles('**/package-lock.json') }}
     - name: Run tests with docker
       run: |
-        apt-get update
-        apt-get install jq
+        sudo apt-get update
+        sudo apt-get install jq
         docker-compose -f docker-compose.grid.yml up -d
         bash wait-for-grid.sh
         contIp=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' selenium-hub)
