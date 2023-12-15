@@ -4,7 +4,7 @@
 2. Make sure you have jdk and node installed.
 3. Run `npm install` to install the modules
 4. Run `npm run test` to run the tests
-5. Run ` npm run report` to see the report
+5. Run `npm run report` to see the report
 
 **Using github actions:**  
 1. Navigate to actions tab
@@ -19,7 +19,7 @@
 
 
 `devtools` protocol has not implemented `addVirtualAuthenticator()` feature yet,   
-so that `selenium-standalone` resolves it along with mobile emulation
-upd: `selenium-standalone` is no longer supported in 8+ wdio versions
+so that `selenium-standalone` resolves it along with mobile emulation   
+upd: `selenium-standalone` is no longer supported in 8+ wdio versions   
 
 We can run tests with mobile emulation like `DEVICE_NAME='iPhone X' npm run test`
