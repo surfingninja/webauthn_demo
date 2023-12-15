@@ -1,0 +1,1 @@
+[{"uid":"ab340b395410daf3","name":"As user I can open the Weabuthn site","time":{"start":1702656457560,"stop":1702656459316,"duration":1756},"status":"passed","severity":"normal"},{"uid":"cd83a66736222248","name":"As user I can register on the WeabuthnIO","time":{"start":1702656459946,"stop":1702656462912,"duration":2966},"status":"passed","severity":"normal"}]
