@@ -1,19 +1,31 @@
 {
-  "compilerOptions": {
-    "moduleResolution": "node",
-    "types": [
-      "node",
-      "@wdio/globals/types",
-      "@wdio/cucumber-framework",
-      "@wdio/devtools-service"
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "module": "ESNext",
+        "target": "ES2022",
+        "lib": [
+            "es2022",
+            "dom"
+        ],
+        "types": [
+            "node",
+            "@wdio/globals/types",
+            "expect-webdriverio",
+            "@wdio/cucumber-framework"
+        ],
+        "skipLibCheck": true,
+        "noEmit": true,
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true
+    },
+    "include": [
+        "test",
+        "wdio.conf.ts"
     ],
-    "lib": [
-      "DOM",
-      "ES7"
-    ],
-    "target": "es6",
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "inlineSourceMap": true
-  }
+    "exclude": []
 }

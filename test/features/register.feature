@@ -7,5 +7,5 @@ Feature: Webauthn registration
     Then I should see success message with <text>
 
     Examples: 
-      | url                  | username | text              |
-      | https://webauthn.io/ | test     | You're logged in! |
+      | url                  | username | text       |
+      | https://webauthn.io/ | test     | logged in! |

@@ -1,11 +1,17 @@
 import type { Options } from '@wdio/types'
-import report from '@wdio/allure-reporter'
 
 interface IChromeOption {
     args: string[];
     mobileEmulation?: any;
 }
 
+type ReporterAllureVars = {
+    Browser: string,
+    Platform: string,
+    Device?: string
+}
+
+const baseUrl = process.env.BASE_URL;
 const serviceName = process.env.SERVICE_NAME;
 const hostName = process.env.HOST_NAME;
 const hostPath = process.env.HOST_PATH;
@@ -26,23 +32,9 @@ const chromeOptions: IChromeOption = {
     // mobileEmulation: { deviceName: deviceName }
 }
 
-const seleniumStandalone = ['selenium-standalone', {
-    logPath: './temp',
-    installArgs: {
-        drivers: {
-            chrome: { version: 'latest' }
-        }
-    },
-    args: {
-        drivers: {
-            chrome: { version: 'latest' }
-        }
-    },
-}];
-let serviceType: any = seleniumStandalone;
-
-if (serviceName) {
-    serviceType = serviceName;
+let reporterAllureVars: ReporterAllureVars = {
+    Browser: 'Chrome',
+    Platform: process.platform
 }
 
 if (isHeadless) {
@@ -52,6 +44,7 @@ if (isHeadless) {
 if (deviceName) {
     chromeOptions.mobileEmulation = { deviceName };
     chromeOptions.args.shift();
+    reporterAllureVars.Device = deviceName;
 }
 
 export const config: Options.Testrunner = {
@@ -59,27 +52,14 @@ export const config: Options.Testrunner = {
     // ====================
     // Runner Configuration
     // ====================
-    //
-    //
-    // =====================
-    // ts-node Configurations
-    // =====================
-    //
-    // You can write tests using TypeScript to get autocompletion and type safety.
-    // You will need typescript and ts-node installed as devDependencies.
-    // WebdriverIO will automatically detect if these dependencies are installed
-    // and will compile your config and tests for you.
-    // If you need to configure how ts-node runs please use the
-    // environment variables for ts-node or use wdio config's autoCompileOpts section.
-    //
-
+    // WebdriverIO supports running e2e tests as well as unit and component tests.
     autoCompileOpts: {
         autoCompile: true,
         // see https://github.com/TypeStrong/ts-node#cli-and-programmatic-options
         // for all available options
         tsNodeOpts: {
-            transpileOnly: true,
-            project: 'tsconfig.json'
+            project: 'tsconfig.json',
+            transpileOnly: true
         }
         // tsconfig-paths is only used if "tsConfigPathsOpts" are provided, if you
         // do please make sure "tsconfig-paths" is installed as dependency
@@ -92,7 +72,7 @@ export const config: Options.Testrunner = {
     // Specify Test Files
     // ==================
     // Define which test specs should run. The pattern is relative to the directory
-    // from which `wdio` was called.
+    // of the configuration file being run.
     //
     // The specs are defined as an array of spec files (optionally using wildcards
     // that will be expanded). The test for each spec file will be run in a separate
@@ -179,11 +159,11 @@ export const config: Options.Testrunner = {
     // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
     // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
     // gets prepended directly.
-    // runner: 'local',
-    baseUrl: 'http://localhost',
-    hostname: hostName ? hostName : 'localhost',
-    port: 4444,
-    path: hostPath ? hostPath : '/',
+    // runner: 'local', // is used by default even commented
+    // baseUrl: baseUrl,
+    // hostname: hostName ? hostName : 'localhost',
+    // port: 4444,
+    // path: hostPath ? hostPath : '/',
     //
     // Default timeout for all waitFor* commands.
     waitforTimeout: 10000,
@@ -193,36 +173,35 @@ export const config: Options.Testrunner = {
     connectionRetryTimeout: 120000,
     //
     // Default request retries count
-    connectionRetryCount: 2,
+    connectionRetryCount: 3,
     //
     // Test runner services
     // Services take over a specific job you don't want to take care of. They enhance
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
-    services: [
-        serviceType
-        // 'docker'
-        // 'devtools'
-        // ['selenium-standalone', {
-        //     logPath: './temp',
-        //     installArgs: {
-        //         drivers: {
-        //             chrome: { version: 'latest' }
-        //         }
-        //     },
-        //     args: {
-        //         drivers: {
-        //             chrome: { version: 'latest' }
-        //         }
-        //     },
-        // }]
-        // ['appium', {
-        //     args: { address: 'localhost', port: 4723, platform: 'Android' },
-        //     logPath: './',
-        //     command: 'appium'
-        // }]
-    ],
-
+    // services: [
+    // serviceType
+    // 'docker'
+    // 'devtools'
+    // ['selenium-standalone', {
+    //     logPath: './temp',
+    //     installArgs: {
+    //         drivers: {
+    //             chrome: { version: 'latest' }
+    //         }
+    //     },
+    //     args: {
+    //         drivers: {
+    //             chrome: { version: 'latest' }
+    //         }
+    //     },
+    // }]
+    // ['appium', {
+    //     args: { address: 'localhost', port: 4723, platform: 'Android' },
+    //     logPath: './',
+    //     command: 'appium'
+    // }]
+    // ],
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
     // see also: https://webdriver.io/docs/frameworks
@@ -237,20 +216,21 @@ export const config: Options.Testrunner = {
     // Delay in seconds between the spec file retry attempts
     // specFileRetriesDelay: 0,
     //
-    // Whether or not retried specfiles should be retried immediately or deferred to the end of the queue
+    // Whether or not retried spec files should be retried immediately or deferred to the end of the queue
     // specFileRetriesDeferred: false,
     //
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter
     reporters: [
+        'spec',
         ['allure', {
             outputDir: 'allure-results',
             disableWebdriverStepsReporting: true,
             disableWebdriverScreenshotsReporting: false,
-            useCucumberStepReporter: true
-        }
-        ]
+            useCucumberStepReporter: true,
+            reportedEnvironmentVars: reporterAllureVars
+        }]
     ],
     //
     // If you are using Cucumber you need to specify the location of your step definitions.
@@ -289,43 +269,43 @@ export const config: Options.Testrunner = {
     // resolved to continue.
     /**
      * Gets executed once before all workers get launched.
-     * @param {Object} config wdio configuration object
+     * @param {object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      */
-    // onPrepare: async function (config, capabilities) {
+    // onPrepare: function (config, capabilities) {
     // },
     /**
-     * Gets executed before a worker process is spawned and can be used to initialise specific service
+     * Gets executed before a worker process is spawned and can be used to initialize specific service
      * for that worker as well as modify runtime environments in an async fashion.
-     * @param  {String} cid      capability id (e.g 0-0)
-     * @param  {[type]} caps     object containing capabilities for session that will be spawn in the worker
-     * @param  {[type]} specs    specs to be run in the worker process
-     * @param  {[type]} args     object that will be merged with the main configuration once worker is initialized
-     * @param  {[type]} execArgv list of string arguments passed to the worker process
+     * @param  {string} cid      capability id (e.g 0-0)
+     * @param  {object} caps     object containing capabilities for session that will be spawn in the worker
+     * @param  {object} specs    specs to be run in the worker process
+     * @param  {object} args     object that will be merged with the main configuration once worker is initialized
+     * @param  {object} execArgv list of string arguments passed to the worker process
      */
-    onWorkerStart: async function (cid, caps, specs, args, execArgv) {
-        // for (let i = 0; i < Object.values(args).length; i++) {
-        //     console.log('argument' + args[i]);
-        // }
-        // // console.log('PROCESS: ', process.argv[process.argv.length - 1]);
-        // console.log('PROCESS: ', process.env.NODE_ENV);
-    },
+    // onWorkerStart: async function (cid, caps, specs, args, execArgv) {
+    // for (let i = 0; i < Object.values(args).length; i++) {
+    //     console.log('argument' + args[i]);
+    // }
+    // // console.log('PROCESS: ', process.argv[process.argv.length - 1]);
+    // console.log('PROCESS: ', process.env.NODE_ENV);
+    // },
     /**
      * Gets executed just after a worker process has exited.
-     * @param  {String} cid      capability id (e.g 0-0)
-     * @param  {Number} exitCode 0 - success, 1 - fail
-     * @param  {[type]} specs    specs to be run in the worker process
-     * @param  {Number} retries  number of retries used
+     * @param  {string} cid      capability id (e.g 0-0)
+     * @param  {number} exitCode 0 - success, 1 - fail
+     * @param  {object} specs    specs to be run in the worker process
+     * @param  {number} retries  number of retries used
      */
     // onWorkerEnd: function (cid, exitCode, specs, retries) {
     // },
     /**
      * Gets executed just before initialising the webdriver session and test framework. It allows you
      * to manipulate configurations depending on the capability or spec.
-     * @param {Object} config wdio configuration object
+     * @param {object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {Array.<String>} specs List of spec file paths that are to be run
-     * @param {String} cid worker id (e.g. 0-0)
+     * @param {string} cid worker id (e.g. 0-0)
      */
     // beforeSession: function (config, capabilities, specs, cid) {
     // },
@@ -334,23 +314,22 @@ export const config: Options.Testrunner = {
      * variables like `browser`. It is the perfect place to define custom commands.
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {Array.<String>} specs        List of spec file paths that are to be run
-     * @param {Object}         browser      instance of created browser/device session
+     * @param {object}         browser      instance of created browser/device session
      */
-    // before: async function (capabilities, specs) {
+    // before: function (capabilities, specs) {
     // },
     /**
      * Runs before a WebdriverIO command gets executed.
-     * @param {String} commandName hook command name
+     * @param {string} commandName hook command name
      * @param {Array} args arguments that command would receive
      */
     // beforeCommand: function (commandName, args) {
-    // await browser.emulateDevice('iPhone X');
     // },
     /**
      * Cucumber Hooks
      *
      * Runs before a Cucumber Feature.
-     * @param {String}                   uri      path to feature file
+     * @param {string}                   uri      path to feature file
      * @param {GherkinDocument.IFeature} feature  Cucumber feature object
      */
     // beforeFeature: function (uri, feature) {
@@ -359,7 +338,7 @@ export const config: Options.Testrunner = {
      *
      * Runs before a Cucumber Scenario.
      * @param {ITestCaseHookParameter} world    world object containing information on pickle and test step
-     * @param {Object}                 context  Cucumber World object
+     * @param {object}                 context  Cucumber World object
      */
     // beforeScenario: function (world, context) {
     // },
@@ -368,7 +347,7 @@ export const config: Options.Testrunner = {
      * Runs before a Cucumber Step.
      * @param {Pickle.IPickleStep} step     step data
      * @param {IPickle}            scenario scenario pickle
-     * @param {Object}             context  Cucumber World object
+     * @param {object}             context  Cucumber World object
      */
     // beforeStep: function (step, scenario, context) {
     // },
@@ -377,11 +356,11 @@ export const config: Options.Testrunner = {
      * Runs after a Cucumber Step.
      * @param {Pickle.IPickleStep} step             step data
      * @param {IPickle}            scenario         scenario pickle
-     * @param {Object}             result           results object containing scenario results
+     * @param {object}             result           results object containing scenario results
      * @param {boolean}            result.passed    true if scenario has passed
      * @param {string}             result.error     error stack if scenario failed
      * @param {number}             result.duration  duration of scenario in milliseconds
-     * @param {Object}             context          Cucumber World object
+     * @param {object}             context          Cucumber World object
      */
     afterStep: async function (step, scenario, result, context) {
         if (result.passed || result.error) {
@@ -392,41 +371,36 @@ export const config: Options.Testrunner = {
      *
      * Runs after a Cucumber Scenario.
      * @param {ITestCaseHookParameter} world            world object containing information on pickle and test step
-     * @param {Object}                 result           results object containing scenario results
+     * @param {object}                 result           results object containing scenario results
      * @param {boolean}                result.passed    true if scenario has passed
      * @param {string}                 result.error     error stack if scenario failed
      * @param {number}                 result.duration  duration of scenario in milliseconds
-     * @param {Object}                 context          Cucumber World object
+     * @param {object}                 context          Cucumber World object
      */
     // afterScenario: function (world, result, context) {
     // },
     /**
      *
      * Runs after a Cucumber Feature.
-     * @param {String}                   uri      path to feature file
+     * @param {string}                   uri      path to feature file
      * @param {GherkinDocument.IFeature} feature  Cucumber feature object
      */
-    afterFeature: function (uri, feature) {
-        report.addEnvironment('Browser', 'Chrome');
-        if (deviceName) {
-            report.addEnvironment('Device', deviceName);
-        }
-        report.addEnvironment('Platform', process.platform);
-    },
+    // afterFeature: function (uri, feature) {
+    // },
 
     /**
      * Runs after a WebdriverIO command gets executed
-     * @param {String} commandName hook command name
+     * @param {string} commandName hook command name
      * @param {Array} args arguments that command would receive
-     * @param {Number} result 0 - command success, 1 - command error
-     * @param {Object} error error object if any
+     * @param {number} result 0 - command success, 1 - command error
+     * @param {object} error error object if any
      */
     // afterCommand: function (commandName, args, result, error) {
     // },
     /**
      * Gets executed after all tests are done. You still have access to all global variables from
      * the test.
-     * @param {Number} result 0 - test pass, 1 - test fail
+     * @param {number} result 0 - test pass, 1 - test fail
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {Array.<String>} specs List of spec file paths that ran
      */
@@ -434,7 +408,7 @@ export const config: Options.Testrunner = {
     // },
     /**
      * Gets executed right after terminating the webdriver session.
-     * @param {Object} config wdio configuration object
+     * @param {object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {Array.<String>} specs List of spec file paths that ran
      */
@@ -443,8 +417,8 @@ export const config: Options.Testrunner = {
     /**
      * Gets executed after all workers got shut down and the process is about to exit. An error
      * thrown in the onComplete hook will result in the test run failing.
-     * @param {Object} exitCode 0 - success, 1 - fail
-     * @param {Object} config wdio configuration object
+     * @param {object} exitCode 0 - success, 1 - fail
+     * @param {object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
@@ -452,10 +426,22 @@ export const config: Options.Testrunner = {
     // },
     /**
     * Gets executed when a refresh happens.
-    * @param {String} oldSessionId session ID of the old session
-    * @param {String} newSessionId session ID of the new session
+    * @param {string} oldSessionId session ID of the old session
+    * @param {string} newSessionId session ID of the new session
     */
     // onReload: function(oldSessionId, newSessionId) {
+    // }
+    /**
+    * Hook that gets executed before a WebdriverIO assertion happens.
+    * @param {object} params information about the assertion to be executed
+    */
+    // beforeAssertion: function(params) {
+    // }
+    /**
+    * Hook that gets executed after a WebdriverIO assertion happened.
+    * @param {object} params information about the assertion that was executed, including its results
+    */
+    // afterAssertion: function(params) {
     // }
 }
 
@@ -463,13 +449,18 @@ if (process.env.DEBUG == "1") {
     console.log("====== Running debug mode ======");
     config.maxInstances = 1;
     config.execArgv = ["--inspect=127.0.0.1"];
-    config.cucumberOpts.timeout = 60000 * 5;
+    // config.cucumberOpts.timeout = 60000 * 5;
 }
 
-
-
-
-
-
+if (baseUrl)
+    config.baseUrl = baseUrl
+if (hostName) {
+    config.hostname = hostName
+    config.port = 4444
+}
+if (hostPath)
+    config.path = hostPath
+if (serviceName)
+    config.services = [serviceName]
 
 

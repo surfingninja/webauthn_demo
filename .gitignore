@@ -3,4 +3,5 @@ allure-results/
 allure-report/
 reports/
 notes.txt
+package-lock.json
 

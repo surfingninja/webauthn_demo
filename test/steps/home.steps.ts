@@ -1,10 +1,10 @@
 import { Given, When, Then } from '@wdio/cucumber-framework';
 
-import HomePage from '../../src/pages/home-page';
+import HomePage from '../../src/pages/home-page.ts';
 
 
 Given(/^I open the browser and load the (.+)$/, async (page) => {
-    await HomePage.open();
+    await HomePage.open(page);
 });
 
 When (/^I authenticate with (.+)$/, async (username) => {

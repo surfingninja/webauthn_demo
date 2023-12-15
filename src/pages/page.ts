@@ -8,8 +8,8 @@ export default class Page {
     * Opens a sub page of the page
     * @param path path of the sub page (e.g. /path/to/page.html)
     */
-    public async open(path = '') {
-        return await browser.url(`https://webauthn.io/${path}`);
+    public async open(path: string) {
+        return await browser.url(path);
     }
 
 }

@@ -1,24 +1,32 @@
-import {ChainablePromiseArray, ChainablePromiseElement, ElementArray} from 'webdriverio'
 import report from '@wdio/allure-reporter'
+import { $, $$ } from '@wdio/globals'
 
-export const setText = async (element:ChainablePromiseElement<WebdriverIO.Element>, text:string) => {
-    await element.setValue(text);
-    report.addStep(`Value entered: ${text}`);
-    
+export const setText = async (element: string, text: string) => {
+    await $(element).setValue(text);
+    await report.addStep(`Value entered: ${text}`);
 }
 
-export const selectDropDown = async(elements:ChainablePromiseArray<ElementArray>, value: string) => {
-    for (let i = 0 ; i < await(elements).length; i++) {
-        const elementValue = await elements[i].getAttribute('value');
-        if(elementValue === value) {
-            await elements[i].click();
-            report.addStep(`Dropdown value selected: ${value}`);
-            break;
+export const selectDropDown = async (dropdown: string, elements: string, value: string) => {
+    await $(dropdown).waitForDisplayed({ timeout: 7000, timeoutMsg: "DropDown is missing" })
+    await $(dropdown).click()
+    await browser.waitUntil(async () => (await $$(elements)).length > 0,
+        {
+            timeout: 5000,
+            timeoutMsg: "No dropdown elemets found"
+        },
+    )
+    const list = await $$(elements)
+    for (let index = 0; index < list.length; index++) {
+        const element = (await list[index].getAttribute('value')).trim()
+        if (element === value) {
+            await list[index].click()
+            await report.addStep(`Dropdown value selected: ${value}`);
+            break
         }
     }
 }
 
-export const addLog = (log:string) => {
+export const addLog = (log: string) => {
     report.addStep(`Step: ${log}`);
 }
 
