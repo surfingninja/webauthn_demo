@@ -18,8 +18,6 @@
 (A report won't be available immidiately, according to github spec it may take up to 10 minutes to post on github pages)
 
 
-`devtools` protocol has not implemented `addVirtualAuthenticator()` feature yet,   
-so that `selenium-standalone` resolves it along with mobile emulation   
 upd: `selenium-standalone` is no longer supported in 8+ wdio versions   
 
 We can run tests with mobile emulation like `DEVICE_NAME='iPhone X' npm run test`
